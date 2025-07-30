@@ -312,3 +312,6 @@ cargarDatosDesdeCSV(SHEET_CSV_URL, () => {
       layer.on('mouseout', function () {
         layer.setStyle({ fillOpacity: 0.2 });
       });
+    }
+  }).addTo(map);
+});
