@@ -1,27 +1,38 @@
-// Inicializa el mapa centrado en Sudamérica
+// =======================
+// INICIALIZACIÓN DEL MAPA
+// =======================
 const map = L.map('map').setView([-15, -55], 3);
 
-// Añade el mapa base de OpenStreetMap
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '© OpenStreetMap contributors'
 }).addTo(map);
 
-// Datos de ejemplo para países
-const detalles = {
-  "Argentina": {
-    arancel: "5.2%",
-    productos: ["Soja", "Trigo", "Carne"],
-    descripcion: "Argentina aplica un arancel promedio del 5.2%."
-  },
-  "Brasil": {
-    arancel: "8.1%",
-    productos: ["Café", "Hierro", "Soja"],
-    descripcion: "Brasil aplica un arancel promedio del 8.1%."
-  }
-  // Puedes agregar más países aquí
-};
+// ==========================================
+// BLOQUE: CARGA DE DATOS DESDE GOOGLE SHEETS
+// ==========================================
+let detalles = {};
 
-// Función para mostrar detalles en el panel izquierdo
+function cargarDatosDesdeCSV(url, callback) {
+  fetch(url)
+    .then(response => response.text())
+    .then(text => {
+      const rows = text.trim().split('\n');
+      for (let i = 1; i < rows.length; i++) {
+        const cols = rows[i].split(',');
+        const pais = cols[0];
+        detalles[pais] = {
+          arancel: cols[1],
+          productos: cols[2] ? cols[2].split(';') : [],
+          descripcion: cols[3] || ''
+        };
+      }
+      callback();
+    });
+}
+
+// ==================================
+// BLOQUE: FUNCIÓN DE MOSTRAR DETALLES
+// ==================================
 function mostrarDetallesPais(pais) {
   const info = detalles[pais];
   if (info) {
@@ -35,7 +46,9 @@ function mostrarDetallesPais(pais) {
   }
 }
 
-// GeoJSON simplificado para Argentina y Brasil
+// ===============================
+// BLOQUE: GEOJSON DE LOS PAÍSES
+// ===============================
 const geojsonData = {
   "type": "FeatureCollection",
   "features": [
@@ -62,23 +75,28 @@ const geojsonData = {
   ]
 };
 
-// Añade los países al mapa y gestiona el clic
-L.geoJSON(geojsonData, {
-  style: {
-    color: "#3388ff",
-    weight: 2,
-    fillOpacity: 0.2
-  },
-  onEachFeature: function (feature, layer) {
-    layer.on('click', function () {
-      mostrarDetallesPais(feature.properties.name);
-      document.querySelector("#info h2").textContent = feature.properties.name;
-    });
-    layer.on('mouseover', function () {
-      layer.setStyle({ fillOpacity: 0.5 });
-    });
-    layer.on('mouseout', function () {
-      layer.setStyle({ fillOpacity: 0.2 });
-    });
-  }
-}).addTo(map);
+// ===========================================
+// BLOQUE: CARGA Y DIBUJO DEL GEOJSON EN EL MAPA
+// ===========================================
+
+// URL de tu Google Sheet publicado como CSV
+const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSGCLpCzHyFDk8wMIUWSDY4zKpMJAabjhlZv_6_4wCmrQRACK5aA-lv05Und6eEVKdsHvqxVqT-zXsJ/pub?output=csv';
+
+// Carga los datos y luego inicializa el GeoJSON en el mapa
+cargarDatosDesdeCSV(SHEET_CSV_URL, () => {
+  L.geoJSON(geojsonData, {
+    style: {
+      color: "#3388ff",
+      weight: 2,
+      fillOpacity: 0.2
+    },
+    onEachFeature: function (feature, layer) {
+      layer.on('click', function () {
+        mostrarDetallesPais(feature.properties.name);
+        document.querySelector("#info h2").textContent = feature.properties.name;
+      });
+      layer.on('mouseover', function () {
+        layer.setStyle({ fillOpacity: 0.5 });
+      });
+      layer.on('mouseout', function () {
+        layer.setStyle({ fillOpacity: 0.2 });
