@@ -42,6 +42,8 @@ function mostrarDetallesPais(pais) {
       <strong>Arancel previamente aplicado o amenazado:</strong> ${info.arancel_prev}<br>
       <strong>Nuevo arancel anunciado:</strong> ${info.arancel_nuevo}<br>
       <strong>Participación en importaciones de EE.UU.:</strong> ${info.participacion}
+      <br><br>
+      <iframe src="https://test1imco.my.canva.site/" width="100%" height="400" style="border:none;"></iframe>
     `;
   } else {
     document.getElementById("country-details").innerHTML = "Información no disponible.";
