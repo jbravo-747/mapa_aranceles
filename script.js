@@ -10,7 +10,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 // ==========================================
 // BLOQUE: CARGA DE DATOS DESDE GOOGLE SHEETS
 // ==========================================
-let detalles = {};
+const detalles = {};
 
 function cargarDatosDesdeCSV(url, callback) {
   fetch(url)
@@ -66,10 +66,6 @@ const NAME_MAP = {
   'South Korea': 'Republic of Korea',
   'Laos': "Lao People's Democratic Republic"
 };
-
-function normalizarNombre(pais) {
-  return NAME_MAP[pais] || pais;
-}
 
 function desnormalizarNombre(admin) {
   return Object.keys(NAME_MAP).find(k => NAME_MAP[k] === admin) || admin;
