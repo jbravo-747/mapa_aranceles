@@ -84,8 +84,8 @@ function desnormalizarNombre(admin) {
             const nombre = desnormalizarNombre(feature.properties.ADMIN);
             if (detalles[nombre]) {
               return {
-                color: "#3388ff",
-                fillColor: "#66b2ff",
+                color: "#28a745",
+                fillColor: "#71d39e",
                 weight: 2,
                 fillOpacity: 0.4,
                 interactive: true
