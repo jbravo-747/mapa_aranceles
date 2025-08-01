@@ -68,38 +68,50 @@ function normalizarNombre(pais) {
   return NAME_MAP[pais] || pais;
 }
 
+function desnormalizarNombre(admin) {
+  return Object.keys(NAME_MAP).find(k => NAME_MAP[k] === admin) || admin;
+}
+
   cargarDatosDesdeCSV(SHEET_CSV_URL, () => {
     fetch(GEOJSON_URL)
       .then(res => res.json())
       .then(worldData => {
-        const seleccionados = Object.keys(detalles).map(normalizarNombre);
-        const filtrados = {
-          type: 'FeatureCollection',
-          features: worldData.features.filter(f => seleccionados.includes(f.properties.ADMIN))
-        };
-
-        const layer = L.geoJSON(filtrados, {
-          style: {
-            color: "#3388ff",
-            weight: 2,
-            fillOpacity: 0.2
+        const layer = L.geoJSON(worldData, {
+          style: function (feature) {
+            const nombre = desnormalizarNombre(feature.properties.ADMIN);
+            if (detalles[nombre]) {
+              return { color: "#3388ff", weight: 2, fillOpacity: 0.2 };
+            }
+            return { color: "#3388ff", weight: 1, fillOpacity: 0 };
           },
           onEachFeature: function (feature, layer) {
-            layer.on('click', function () {
-              const nombre = Object.keys(NAME_MAP).find(k => NAME_MAP[k] === feature.properties.ADMIN) || feature.properties.ADMIN;
-              mostrarDetallesPais(nombre);
-              document.querySelector("#info h2").textContent = nombre;
-            });
-            layer.on('mouseover', function () {
-              layer.setStyle({ fillOpacity: 0.5 });
-            });
-            layer.on('mouseout', function () {
-              layer.setStyle({ fillOpacity: 0.2 });
-            });
+            const nombre = desnormalizarNombre(feature.properties.ADMIN);
+            if (detalles[nombre]) {
+              layer.on('click', function () {
+                mostrarDetallesPais(nombre);
+                document.querySelector("#info h2").textContent = nombre;
+              });
+              layer.on('mouseover', function () {
+                layer.setStyle({ fillOpacity: 0.5 });
+              });
+              layer.on('mouseout', function () {
+                layer.setStyle({ fillOpacity: 0.2 });
+              });
+            }
           }
         }).addTo(map);
 
-        map.fitBounds(layer.getBounds());
+        const bounds = L.latLngBounds([]);
+        layer.eachLayer(l => {
+          const nombre = desnormalizarNombre(l.feature.properties.ADMIN);
+          if (detalles[nombre]) bounds.extend(l.getBounds());
+        });
+
+        if (bounds.isValid()) {
+          map.fitBounds(bounds);
+        } else {
+          map.fitWorld();
+        }
       })
       .catch(err => {
         console.error('Error al cargar GeoJSON', err);
