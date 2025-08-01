@@ -39,16 +39,19 @@ function cargarDatosDesdeCSV(url, callback) {
 // ==================================
 function mostrarDetallesPais(pais) {
   const info = detalles[pais];
+  const header = document.querySelector("#info h2");
   if (info) {
+    header.textContent = pais;
     document.getElementById("country-details").innerHTML = `
-  <strong>País:</strong> ${pais}<br>
-  <strong>Arancel previamente aplicado o amenazado:</strong> ${info.arancel_prev}<br>
-  <strong>Nuevo arancel anunciado:</strong> ${info.arancel_nuevo}<br>
-  <strong>Participación en importaciones de EE.UU.:</strong> ${info.participacion}<br><br>
-  <div class="video-container">
-    <iframe loading="lazy" src="https://www.canva.com/design/DAGuxMqtXow/uJeCd-UaH0JTn2-0_oVzeA/watch?embed" allowfullscreen></iframe>
-  </div>`;
+    <strong>País:</strong> ${pais}<br>
+    <strong>Arancel previamente aplicado o amenazado:</strong> ${info.arancel_prev}<br>
+    <strong>Nuevo arancel anunciado:</strong> ${info.arancel_nuevo}<br>
+    <strong>Participación en importaciones de EE.UU.:</strong> ${info.participacion}<br><br>
+    <div class="video-container">
+      <iframe loading="lazy" src="https://www.canva.com/design/DAGuxMqtXow/uJeCd-UaH0JTn2-0_oVzeA/watch?embed" allowfullscreen></iframe>
+    </div>`;
   } else {
+    header.textContent = "Selecciona un país";
     document.getElementById("country-details").innerHTML = "Información no disponible.";
   }
 }
@@ -80,22 +83,32 @@ function desnormalizarNombre(admin) {
           style: function (feature) {
             const nombre = desnormalizarNombre(feature.properties.ADMIN);
             if (detalles[nombre]) {
-              return { color: "#3388ff", weight: 2, fillOpacity: 0.2 };
+              return {
+                color: "#3388ff",
+                fillColor: "#66b2ff",
+                weight: 2,
+                fillOpacity: 0.4,
+                interactive: true
+              };
             }
-            return { color: "#3388ff", weight: 1, fillOpacity: 0 };
+            return {
+              color: "#999",
+              weight: 1,
+              fillOpacity: 0,
+              interactive: false
+            };
           },
           onEachFeature: function (feature, layer) {
             const nombre = desnormalizarNombre(feature.properties.ADMIN);
             if (detalles[nombre]) {
               layer.on('click', function () {
                 mostrarDetallesPais(nombre);
-                document.querySelector("#info h2").textContent = nombre;
               });
               layer.on('mouseover', function () {
-                layer.setStyle({ fillOpacity: 0.5 });
+                layer.setStyle({ fillOpacity: 0.6 });
               });
               layer.on('mouseout', function () {
-                layer.setStyle({ fillOpacity: 0.2 });
+                layer.setStyle({ fillOpacity: 0.4 });
               });
             }
           }
