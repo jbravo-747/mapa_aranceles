@@ -13,20 +13,22 @@
     <h1>Mundo Aranceles</h1>
     <div class="search-wrap">
       <input id="country-search" type="search" placeholder="Buscar país..." aria-label="Buscar país" />
-      <button id="clear-search" title="Limpiar búsqueda">✕</button>
+      <button id="clear-search" class="btn-icon" title="Limpiar búsqueda" aria-label="Limpiar búsqueda">✕</button>
+      <button id="toggle-panel" class="btn-primary show-on-mobile" aria-expanded="false" aria-controls="info">Detalles</button>
     </div>
   </header>
 
-  <div id="container">
+  <main id="container" role="main">
     <div id="map" aria-label="Mapa mundial interactivo"></div>
-    <aside id="info" aria-live="polite">
+    <aside id="info" aria-live="polite" class="sheet" tabindex="-1">
+      <div class="sheet-handle show-on-mobile" role="button" aria-label="Arrastrar o tocar para cerrar/abrir"></div>
       <h2 id="panel-title">Selecciona un país</h2>
       <div id="country-details"></div>
     </aside>
-  </div>
+  </main>
 
   <footer class="app-footer">
-    <div class="legend">
+    <div class="legend hide-on-mobile">
       <span class="legend-swatch legend-default"></span> País
       <span class="legend-swatch legend-hover"></span> Hover
       <span class="legend-swatch legend-selected"></span> Seleccionado

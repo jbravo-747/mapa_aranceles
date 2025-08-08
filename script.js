@@ -10,7 +10,8 @@ const HOVER_STYLE =   { fillOpacity: 0.35, fillColor: "#93c5fd" };
 const SELECT_STYLE =  { color: "#1d4ed8", weight: 2, fillOpacity: 0.45, fillColor: "#a5b4fc" };
 
 let map, worldLayer, detailsByCountry = {}, selectedLayer = null;
-let nameToLayer = new Map(); // Mapa de nombre normalizado -> layer
+let nameToLayer = new Map(); // nombre normalizado -> layer
+let barChart = null;
 
 // Aliases para conciliar nombres entre CSV y GeoJSON
 const COUNTRY_ALIASES = new Map(Object.entries({
@@ -35,6 +36,8 @@ const COUNTRY_ALIASES = new Map(Object.entries({
   "Ivory Coast": "Côte d'Ivoire",
   "Laos": "Lao People's Democratic Republic"
 }));
+
+const mqMobile = window.matchMedia("(max-width: 920px)");
 
 function normName(name){
   return (name || "").toString().trim().toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "");
@@ -66,9 +69,8 @@ function loadSheetData(){
       header: true,
       skipEmptyLines: true,
       complete: (res) => {
-        // Esperamos columnas: pais, arancel_prev, arancel_nuevo, participacion
         res.data.forEach(row => {
-          const rawName = (row[Object.keys(row)[0]] || "").replace('*','').trim(); // 1a columna = país (por si el encabezado no es exacto)
+          const rawName = (row[Object.keys(row)[0]] || "").replace('*','').trim(); // 1a columna = país
           const countryName = mapCsvNameToGeojson(rawName);
           detailsByCountry[countryName] = {
             arancel_prev: row.arancel_prev || row[Object.keys(row)[1]] || "",
@@ -126,23 +128,21 @@ function selectCountry(displayName, layer){
   layer.setStyle(SELECT_STYLE);
 
   // Acercar al país
-  try{
-    map.fitBounds(layer.getBounds(), { padding:[10,10] });
-  }catch(_){ /* no-op */ }
+  try{ map.fitBounds(layer.getBounds(), { padding:[10,10] }); }catch(_){}
 
   // Mostrar detalles
   const countryKey = mapCsvNameToGeojson(displayName);
   showCountryDetails(countryKey);
 
-  // Guardar selección
+  // Guardar y abrir panel en móvil
   localStorage.setItem("lastCountry", displayName);
   document.getElementById("panel-title").textContent = displayName;
+  openSheetOnMobile(true);
 }
 
 // =======================
 // Panel de detalles
 // =======================
-let barChart = null;
 function showCountryDetails(countryName){
   const info = detailsByCountry[countryName] || null;
   const container = document.getElementById("country-details");
@@ -223,12 +223,12 @@ function parseNumber(s){
 function setupSearch(){
   const input = document.getElementById('country-search');
   const clearBtn = document.getElementById('clear-search');
+  const toggleBtn = document.getElementById('toggle-panel');
 
   function findAndSelect(val){
     const key = normName(val);
     if(!key) return;
 
-    // Buscar por nombre directo o por coincidencia parcial
     let foundEntry = null;
     for(const [nameKey, layer] of nameToLayer.entries()){
       if(nameKey === key || nameKey.includes(key)){
@@ -257,7 +257,27 @@ function setupSearch(){
     }
     document.getElementById("panel-title").textContent = "Selecciona un país";
     document.getElementById("country-details").innerHTML = "";
+    openSheetOnMobile(false);
   });
+
+  toggleBtn.addEventListener('click', () => {
+    const willOpen = !document.getElementById('info').classList.contains('open');
+    openSheetOnMobile(willOpen);
+  });
+}
+
+// =======================
+// Bottom sheet helpers
+// =======================
+function openSheetOnMobile(open){
+  const sheet = document.getElementById('info');
+  const toggleBtn = document.getElementById('toggle-panel');
+  const mqMobile = window.matchMedia("(max-width: 920px)");
+  if(!mqMobile.matches) return; // Sólo en móvil
+
+  sheet.classList.toggle('open', !!open);
+  toggleBtn.setAttribute('aria-expanded', (!!open).toString());
+  if(open){ sheet.focus(); }
 }
 
 // =======================
