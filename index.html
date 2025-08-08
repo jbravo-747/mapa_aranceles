@@ -2,21 +2,44 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Mundo Aranceles</title>
-  <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="container">
-    <div id="map"></div>
-    <div id="info">
-      <h2>Selecciona un país</h2>
-      <div id="country-details"></div>
+  <header class="app-header">
+    <h1>Mundo Aranceles</h1>
+    <div class="search-wrap">
+      <input id="country-search" type="search" placeholder="Buscar país..." aria-label="Buscar país" />
+      <button id="clear-search" title="Limpiar búsqueda">✕</button>
     </div>
+  </header>
+
+  <div id="container">
+    <div id="map" aria-label="Mapa mundial interactivo"></div>
+    <aside id="info" aria-live="polite">
+      <h2 id="panel-title">Selecciona un país</h2>
+      <div id="country-details"></div>
+    </aside>
   </div>
+
+  <footer class="app-footer">
+    <div class="legend">
+      <span class="legend-swatch legend-default"></span> País
+      <span class="legend-swatch legend-hover"></span> Hover
+      <span class="legend-swatch legend-selected"></span> Seleccionado
+    </div>
+    <small>Fuente de mapa: OpenStreetMap &middot; Datos: Google Sheets</small>
+  </footer>
+
+  <!-- Libs -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- App -->
   <script src="script.js"></script>
 </body>
 </html>
-
