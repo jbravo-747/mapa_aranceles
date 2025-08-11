@@ -39,6 +39,67 @@ const COUNTRY_ALIASES = new Map(Object.entries({
 
 const mqMobile = window.matchMedia("(max-width: 920px)");
 
+// =======================
+// Utilidades de vista / móvil
+// =======================
+const MOBILE_BREAKPOINT = 920;
+function isMobile() {
+  return window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`).matches;
+}
+
+// =======================
+// Selector móvil de países
+// =======================
+const mobileSelectEl = document.getElementById('country-select');
+
+function buildCountryList() {
+  // Unimos nombres del GeoJSON y del CSV (detailsByCountry) para robustez
+  const names = new Set();
+
+  // Desde GeoJSON (name/admin/ADMIN)
+  if (worldLayer) {
+    worldLayer.eachLayer(l => {
+      const f = l.feature || {};
+      const nm = (f.properties && (f.properties.name || f.properties.admin || f.properties.ADMIN)) || null;
+      if (nm) names.add(nm);
+    });
+  }
+  // Desde CSV canónico (keys exactas usadas para lookup de datos)
+  Object.keys(detailsByCountry || {}).forEach(n => names.add(n));
+
+  // A arreglo y orden alfabético ES
+  return Array.from(names).sort((a,b) => a.localeCompare(b, 'es', {sensitivity:'base'}));
+}
+
+function populateMobileSelect() {
+  if (!mobileSelectEl) return;
+  // Limpia excepto placeholder
+  const opts = Array.from(mobileSelectEl.querySelectorAll('option:not(:first-child)'));
+  opts.forEach(o => o.remove());
+
+  const list = buildCountryList();
+  const frag = document.createDocumentFragment();
+  list.forEach(name => {
+    const opt = document.createElement('option');
+    opt.value = name; // mantenemos el displayName
+    opt.textContent = name;
+    frag.appendChild(opt);
+  });
+  mobileSelectEl.appendChild(frag);
+}
+
+function onMobileSelectChange(e) {
+  const name = e.target.value;
+  if (!name) return;
+  // Cargar datos y abrir panel SIN necesidad del mapa
+  selectCountry(name, null, { focusMap: false });
+}
+
+if (mobileSelectEl) {
+  mobileSelectEl.addEventListener('change', onMobileSelectChange);
+}
+
+
 function normName(name){
   return (name || "").toString().trim().toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "");
 }
@@ -120,10 +181,51 @@ function addWorldLayer(geojson){
 // =======================
 // Selección de país
 // =======================
-function selectCountry(displayName, layer){
-  if(selectedLayer && selectedLayer !== layer){
-    selectedLayer.setStyle(DEFAULT_STYLE);
+
+function selectCountry(displayName, layer, opts = {}){
+  const { focusMap = true } = opts;
+
+  // Si no viene layer (p.ej., selección desde <select>), intenta encontrarlo
+  if (!layer) {
+    const key = normName(displayName);
+    layer = nameToLayer.get(key) || null;
   }
+
+  // Restaurar estilo del anterior seleccionado
+  if (selectedLayer && selectedLayer !== layer){
+    try { selectedLayer.setStyle(DEFAULT_STYLE); } catch(_){}
+  }
+  // Marcar y acercar solo si hay capa y NO estamos en móvil (o si focusMap true)
+  if (layer){
+    selectedLayer = layer;
+    try { layer.setStyle(SELECT_STYLE); } catch(_){}
+    if (focusMap && !isMobile()) {
+      try{ map.fitBounds(layer.getBounds(), { padding:[10,10] }); }catch(_){}
+    }
+  } else {
+    selectedLayer = null; // no hay capa (p.ej., móvil sin mapa)
+  }
+
+  // Mostrar detalles (convierte a nombre canónico si hay alias)
+  const countryKey = mapCsvNameToGeojson(displayName);
+  showCountryDetails(countryKey);
+
+  // Título del panel y almacenamiento
+  try {
+    localStorage.setItem("lastCountry", displayName);
+  } catch(_) {}
+  document.getElementById("panel-title").textContent = displayName;
+
+  // Abrir panel en móvil
+  openSheetOnMobile(true);
+
+  // Sincronizar el <select> si existe
+  if (mobileSelectEl && mobileSelectEl.value !== displayName) {
+    // Solo establecer si la opción existe
+    const exists = Array.from(mobileSelectEl.options).some(o => o.value === displayName);
+    if (exists) mobileSelectEl.value = displayName;
+  }
+}
   selectedLayer = layer;
   layer.setStyle(SELECT_STYLE);
 
@@ -273,6 +375,67 @@ function openSheetOnMobile(open){
   const sheet = document.getElementById('info');
   const toggleBtn = document.getElementById('toggle-panel');
   const mqMobile = window.matchMedia("(max-width: 920px)");
+
+// =======================
+// Utilidades de vista / móvil
+// =======================
+const MOBILE_BREAKPOINT = 920;
+function isMobile() {
+  return window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`).matches;
+}
+
+// =======================
+// Selector móvil de países
+// =======================
+const mobileSelectEl = document.getElementById('country-select');
+
+function buildCountryList() {
+  // Unimos nombres del GeoJSON y del CSV (detailsByCountry) para robustez
+  const names = new Set();
+
+  // Desde GeoJSON (name/admin/ADMIN)
+  if (worldLayer) {
+    worldLayer.eachLayer(l => {
+      const f = l.feature || {};
+      const nm = (f.properties && (f.properties.name || f.properties.admin || f.properties.ADMIN)) || null;
+      if (nm) names.add(nm);
+    });
+  }
+  // Desde CSV canónico (keys exactas usadas para lookup de datos)
+  Object.keys(detailsByCountry || {}).forEach(n => names.add(n));
+
+  // A arreglo y orden alfabético ES
+  return Array.from(names).sort((a,b) => a.localeCompare(b, 'es', {sensitivity:'base'}));
+}
+
+function populateMobileSelect() {
+  if (!mobileSelectEl) return;
+  // Limpia excepto placeholder
+  const opts = Array.from(mobileSelectEl.querySelectorAll('option:not(:first-child)'));
+  opts.forEach(o => o.remove());
+
+  const list = buildCountryList();
+  const frag = document.createDocumentFragment();
+  list.forEach(name => {
+    const opt = document.createElement('option');
+    opt.value = name; // mantenemos el displayName
+    opt.textContent = name;
+    frag.appendChild(opt);
+  });
+  mobileSelectEl.appendChild(frag);
+}
+
+function onMobileSelectChange(e) {
+  const name = e.target.value;
+  if (!name) return;
+  // Cargar datos y abrir panel SIN necesidad del mapa
+  selectCountry(name, null, { focusMap: false });
+}
+
+if (mobileSelectEl) {
+  mobileSelectEl.addEventListener('change', onMobileSelectChange);
+}
+
   if(!mqMobile.matches) return; // Sólo en móvil
 
   sheet.classList.toggle('open', !!open);
@@ -289,7 +452,10 @@ function restoreLastSelection(){
   const key = normName(last);
   const layer = nameToLayer.get(key);
   if(layer){
-    selectCountry(last, layer);
+    selectCountry(last, layer, { focusMap: !isMobile() });
+  } else {
+    // En móvil podría no existir capa usable; carga detalles de todas formas
+    selectCountry(last, null, { focusMap: false });
   }
 }
 
@@ -303,6 +469,7 @@ function restoreLastSelection(){
     const world = await loadWorldGeoJSON();
     addWorldLayer(world);
     setupSearch();
+    populateMobileSelect();
     restoreLastSelection();
   }catch(err){
     console.error(err);

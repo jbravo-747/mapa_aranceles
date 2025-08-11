@@ -1,47 +1,44 @@
 
 <!DOCTYPE html>
+
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Mundo Aranceles</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <link rel="stylesheet" href="style.css" />
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Mundo Aranceles</title>
+<link href="https://unpkg.com/leaflet/dist/leaflet.css" rel="stylesheet"/>
+<link href="style.css" rel="stylesheet"/>
 </head>
 <body>
-  <header class="app-header">
-    <h1>Mundo Aranceles</h1>
-    <div class="search-wrap">
-      <input id="country-search" type="search" placeholder="Buscar país..." aria-label="Buscar país" />
-      <button id="clear-search" class="btn-icon" title="Limpiar búsqueda" aria-label="Limpiar búsqueda">✕</button>
-      <button id="toggle-panel" class="btn-primary show-on-mobile" aria-expanded="false" aria-controls="info">Detalles</button>
-    </div>
-  </header>
-
-  <main id="container" role="main">
-    <div id="map" aria-label="Mapa mundial interactivo"></div>
-    <aside id="info" aria-live="polite" class="sheet" tabindex="-1">
-      <div class="sheet-handle show-on-mobile" role="button" aria-label="Arrastrar o tocar para cerrar/abrir"></div>
-      <h2 id="panel-title">Selecciona un país</h2>
-      <div id="country-details"></div>
-    </aside>
-  </main>
-
-  <footer class="app-footer">
-    <div class="legend hide-on-mobile">
-      <span class="legend-swatch legend-default"></span> País
+<header class="app-header">
+<h1>Mundo Aranceles</h1>
+<div class="search-wrap">
+<input aria-label="Buscar país" id="country-search" placeholder="Buscar país..." type="search"/>
+<button aria-label="Limpiar búsqueda" class="btn-icon" id="clear-search" title="Limpiar búsqueda">✕</button>
+<button aria-controls="info" aria-expanded="false" class="btn-primary show-on-mobile" id="toggle-panel">Detalles</button>
+</div>
+</header>
+<main id="container" role="main"><div class="mobile-only" id="mobile-controls"><label class="sr-only" for="country-select">Selecciona un país</label><select id="country-select"><option value="">— Selecciona un país —</option></select></div>
+<div aria-label="Mapa mundial interactivo" id="map"></div>
+<aside aria-live="polite" class="sheet" id="info" tabindex="-1">
+<div aria-label="Arrastrar o tocar para cerrar/abrir" class="sheet-handle show-on-mobile" role="button"></div>
+<h2 id="panel-title">Selecciona un país</h2>
+<div id="country-details"></div>
+</aside>
+</main>
+<footer class="app-footer">
+<div class="legend hide-on-mobile">
+<span class="legend-swatch legend-default"></span> País
       <span class="legend-swatch legend-hover"></span> Hover
       <span class="legend-swatch legend-selected"></span> Seleccionado
     </div>
-    <small>Fuente de mapa: OpenStreetMap &middot; Datos: Google Sheets</small>
-  </footer>
-
-  <!-- Libs -->
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-
-  <!-- App -->
-  <script src="script.js"></script>
+<small>Fuente de mapa: OpenStreetMap · Datos: Google Sheets</small>
+</footer>
+<!-- Libs -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<!-- App -->
+<script src="script.js"></script>
 </body>
 </html>

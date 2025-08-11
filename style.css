@@ -1,4 +1,3 @@
-
 :root{
   --border:#d0d5dd;
   --bg:#f7f7f8;
@@ -211,4 +210,47 @@ h1{
 .leaflet-control-zoom{ margin: 10px; }
 .leaflet-touch .leaflet-bar a{
   padding: 0;
+}
+
+/* --- Mobile country selector --- */
+#mobile-controls { display: none; }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 1px, 1px);
+  white-space: nowrap;
+  border: 0;
+}
+
+#mobile-controls {
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 12px;
+  position: sticky;
+  top: 3.2rem; /* below header */
+  z-index: 49;
+}
+
+#country-select {
+  width: 100%;
+  font-size: 16px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #fff;
+}
+
+/* Override layout for mobile-only view (hide map, show select) */
+@media (max-width: 920px){
+  #mobile-controls { display: block; }
+  #map { display: none; }
+  #container{
+    grid-template-columns: 1fr;
+    height: auto;
+  }
 }
