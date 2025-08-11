@@ -2,7 +2,10 @@
 // =======================
 // Configuración inicial
 // =======================
-const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSGCLpCzHyFDk8wMIUWSDY4zKpMJAabjhlZv_6_4wCmrQRACK5aA-lv05Und6eEVKdsHvqxVqT-zXsJ/pub?output=csv';
+const SHEET_PUBLISHED_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSGCLpCzHyFDk8wMIUWSDY4zKpMJAabjhlZv_6_4wCmrQRACK5aA-lv05Und6eEVKdsHvqxVqT-zXsJ/pubhtml';
+// Si necesitas una pestaña específica, coloca su GID aquí, p. ej. const SHEET_GID = '0'; de lo contrario déjalo vacío.
+const SHEET_GID = '';
+const SHEET_CSV_URL = SHEET_PUBLISHED_URL.replace('/pubhtml', '/pub?output=csv') + (SHEET_GID ? `&gid=${SHEET_GID}` : '');
 const WORLD_GEOJSON_URL = 'https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json';
 
 const DEFAULT_STYLE = { color: "#6366f1", weight: 1, fillOpacity: 0.15, fillColor: "#c7d2fe" };
