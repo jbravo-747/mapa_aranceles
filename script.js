@@ -2,10 +2,7 @@
 // =======================
 // Configuración inicial
 // =======================
-const SHEET_PUBLISHED_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSGCLpCzHyFDk8wMIUWSDY4zKpMJAabjhlZv_6_4wCmrQRACK5aA-lv05Und6eEVKdsHvqxVqT-zXsJ/pubhtml';
-// Si necesitas una pestaña específica, coloca su GID aquí, p. ej. const SHEET_GID = '0'; de lo contrario déjalo vacío.
-const SHEET_GID = '';
-const SHEET_CSV_URL = SHEET_PUBLISHED_URL.replace('/pubhtml', '/pub?output=csv') + (SHEET_GID ? `&gid=${SHEET_GID}` : '');
+const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSGCLpCzHyFDk8wMIUWSDY4zKpMJAabjhlZv_6_4wCmrQRACK5aA-lv05Und6eEVKdsHvqxVqT-zXsJ/pub?output=csv';
 const WORLD_GEOJSON_URL = 'https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json';
 
 const DEFAULT_STYLE = { color: "#6366f1", weight: 1, fillOpacity: 0.15, fillColor: "#c7d2fe" };
@@ -228,21 +225,6 @@ function selectCountry(displayName, layer, opts = {}){
     const exists = Array.from(mobileSelectEl.options).some(o => o.value === displayName);
     if (exists) mobileSelectEl.value = displayName;
   }
-}
-  selectedLayer = layer;
-  layer.setStyle(SELECT_STYLE);
-
-  // Acercar al país
-  try{ map.fitBounds(layer.getBounds(), { padding:[10,10] }); }catch(_){}
-
-  // Mostrar detalles
-  const countryKey = mapCsvNameToGeojson(displayName);
-  showCountryDetails(countryKey);
-
-  // Guardar y abrir panel en móvil
-  localStorage.setItem("lastCountry", displayName);
-  document.getElementById("panel-title").textContent = displayName;
-  openSheetOnMobile(true);
 }
 
 // =======================
